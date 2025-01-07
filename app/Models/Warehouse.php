@@ -9,12 +9,9 @@ class Warehouse extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_name', 'quantity'];
-
-    public function incomingGoods()
-    {
-        return $this->hasOne(IncomingGoods::class, 'product_name', 'product_name');
-    }
-
+    protected $fillable = [
+        'product_name',
+        'quantity',
+        'date_in',
+    ];
 }
-

@@ -16,8 +16,9 @@ class IncomingGoodsController extends Controller
 
     public function add()
     {
-        return view('incomingGoods.add');
-    }
+        $products = Warehouse::pluck('product_name', 'id');  
+        return view('incomingGoods.add', compact('products'));
+    }    
 
 
     public function store(Request $request)
@@ -39,11 +40,13 @@ class IncomingGoodsController extends Controller
             Warehouse::create([
                 'product_name' => $validatedData['product_name'],
                 'quantity' => $validatedData['quantity'],
+                'date_in' => $validatedData['date_in'],
             ]);
         }
 
         return redirect()->route('incomingGoods.index')->with('success', 'Goods added and warehouse updated successfully.');
     }
+
 
     public function edit($id)
     {
@@ -54,32 +57,48 @@ class IncomingGoodsController extends Controller
 
     public function update(Request $request, $id)
     {
-        $incomingGoods = IncomingGoods::find($id);
-
-        $oldQuantity = $incomingGoods->quantity;
-        $productName = $incomingGoods->product_name;
-
-        $incomingGoods->update([
-            'product_name' => $request->product_name,
-            'date_in' => $request->date_in,
-            'quantity' => $request->quantity,
-            'origin' => $request->origin,
+        $validatedData = $request->validate([
+            'product_name' => 'required|string|max:255',
+            'quantity' => 'required|integer|min:1',
+            'date_in' => 'required|date',
+            'origin' => 'required|string|max:255',
         ]);
 
-        $warehouse = Warehouse::where('product_name', $productName)->first();
+        $incomingGoods = IncomingGoods::findOrFail($id);
+
+        $warehouse = Warehouse::where('product_name', $validatedData['product_name'])->first();
+
         if ($warehouse) {
-            $warehouse->quantity += ($request->quantity - $oldQuantity); 
+            $warehouse->quantity -= $incomingGoods->quantity;
+
+            $incomingGoods->update($validatedData);
+
+            $warehouse->quantity += $validatedData['quantity'];
             $warehouse->save();
         }
 
-        return redirect()->route('incomingGoods.index')->with('success', 'Goods Incoming updated successfully.');
+        return redirect()->route('incomingGoods.index')->with('success', 'Incoming goods updated and warehouse quantity adjusted.');
     }
 
     public function destroy($id)
     {
         $goods = IncomingGoods::findOrFail($id);
+
+        $warehouse = Warehouse::where('product_name', $goods->product_name)->first();
+
+        if ($warehouse) {
+            $warehouse->quantity -= $goods->quantity;
+
+            if ($warehouse->quantity < 0) {
+                $warehouse->quantity = 0;
+            }
+
+            $warehouse->save();
+        }
+
         $goods->delete();
-        return redirect()->route('incomingGoods.index')->with('success', 'Item deleted successfully');
+
+        return redirect()->route('incomingGoods.index')->with('success', 'Item deleted successfully and warehouse quantity reset.');
     }
 
 }

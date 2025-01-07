@@ -71,7 +71,14 @@
                                             <div class="col-6">
                                                 <div class="form-group">
                                                     <label for="product_name">Product Name</label>
-                                                    <input type="text" name="product_name" id="product_name" class="form-control" placeholder="Enter product name" required>
+                                                    <select class="form-control" name="product_name" id="product_name" required>
+                                                        <option value="">Select Product</option>
+                                                        @foreach ($products as $id => $productName)
+                                                            <option value="{{ $productName }}" {{ old('product_name') == $productName ? 'selected' : '' }}>
+                                                                {{ $productName }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
                                             </div>
                                             <div class="col-6">

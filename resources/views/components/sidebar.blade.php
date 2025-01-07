@@ -9,7 +9,7 @@
             <div class="sidebar-brand-icon rotate-n-15">
                 <img class="img-profile rounded-circle" src="{{ asset('img/favicon-tripaconsult.jpeg') }}" width="40px">
             </div>
-            <div class="sidebar-brand-text mx-3">T-Consume</div>
+            <div class="sidebar-brand-text mx-3">Tech-Logistich</div>
         </a>
 
         <!-- Divider -->
@@ -42,7 +42,7 @@
         <li class="nav-item {{ Request::is('outcoming-goods*') ? 'active' : '' }}">
             <a class="nav-link" href="/outcoming-goods">
                 <i class="fas fa-fw fa fa-upload"></i>
-                <span>Outcoming Goods</span>
+                <span>Outgoing Goods</span>
             </a>
         </li>
         
@@ -51,15 +51,15 @@
         <hr class="sidebar-divider">
 
         <!-- Nav Item - Warehouse -->
-        {{-- <li class="nav-item {{ Request::is('warehouse*') ? 'active' : '' }}">
+        <li class="nav-item {{ Request::is('warehouse*') ? 'active' : '' }}">
             <a class="nav-link" href="/warehouse">
                 <i class="fas fa-warehouse"></i>
                 <span>Warehouse</span>
             </a>
-        </li> --}}
+        </li>
 
         <!-- Divider -->
-        {{-- <hr class="sidebar-divider d-none d-md-block"> --}}
+        <hr class="sidebar-divider d-none d-md-block">
 
     </ul>
     <!-- End of Sidebar -->

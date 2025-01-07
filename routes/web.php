@@ -22,8 +22,6 @@ use Illuminate\Support\Facades\Route;
 // Route for Home 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::resource('warehouse', WarehouseController::class);
-
 
 // Route for Incoming Goods
 Route::resource('incomingGoods', IncomingGoodsController::class);
@@ -42,5 +40,14 @@ Route::get('outcoming-goods/add', [OutcomingGoodsController::class, 'add'])->nam
 Route::post('/outcoming-goods/store', [OutcomingGoodsController::class, 'store'])->name('outcomingGoods.store');
 Route::post('/get-product-stock', [OutcomingGoodsController::class, 'getProductStock'])->name('getProductStock');
 Route::put('outcoming-goods/{id}', [OutcomingGoodsController::class, 'update'])->name('outcomingGoods.update');
+
+// Route For Warehouses
+Route::get('/warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
+Route::resource('warehouse', WarehouseController::class)->except(['create', 'show']);
+Route::get('/warehouse/add', [WarehouseController::class, 'add'])->name('warehouse.add');
+Route::post('/warehouse/store', [WarehouseController::class, 'store'])->name('warehouse.store');
+
+
+
 
 

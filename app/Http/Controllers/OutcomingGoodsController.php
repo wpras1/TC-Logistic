@@ -70,6 +70,11 @@ class OutcomingGoodsController extends Controller
     public function update(Request $request, $id)
     {
         $outcomingGoods = OutcomingGoods::find($id);
+
+        // Ambil data quantity sebelum diupdate (untuk menghitung selisih)
+        $oldQuantity = $outcomingGoods->quantity;
+
+        // Update data outcoming goods
         $outcomingGoods->update([
             'product_name' => $request->product_name,
             'date_out' => $request->date_out,
@@ -77,16 +82,47 @@ class OutcomingGoodsController extends Controller
             'destination' => $request->destination,
         ]);
 
+        // Ambil data warehouse untuk produk yang terpilih
+        $warehouse = Warehouse::where('product_name', $outcomingGoods->product_name)->first();
+
+        if ($warehouse) {
+            // Hitung selisih quantity, kemudian update quantity di warehouse
+            $quantityDifference = $request->quantity - $oldQuantity;
+
+            // Tambahkan selisih quantity ke warehouse
+            $warehouse->quantity -= $quantityDifference;
+
+            // Pastikan quantity tidak negatif
+            if ($warehouse->quantity < 0) {
+                $warehouse->quantity = 0;
+            }
+
+            // Simpan perubahan pada warehouse
+            $warehouse->save();
+        }
+
         return redirect()->route('outcomingGoods.index')->with('success', 'Goods Outgoing updated successfully.');
     }
 
-
-
     public function destroy($id)
     {
+        // Ambil data outcoming goods yang akan dihapus
         $goods = OutcomingGoods::findOrFail($id);
+
+        // Ambil data warehouse untuk produk yang terpilih
+        $warehouse = Warehouse::where('product_name', $goods->product_name)->first();
+
+        if ($warehouse) {
+            // Tambahkan quantity yang dikeluarkan kembali ke warehouse
+            $warehouse->quantity += $goods->quantity;
+
+            // Simpan perubahan pada warehouse
+            $warehouse->save();
+        }
+
+        // Hapus data outcoming goods
         $goods->delete();
-        return redirect()->route('outcomingGoods.index')->with('success', 'Item deleted successfully');
-    }
-    
+
+        return redirect()->route('outcomingGoods.index')->with('success', 'Item deleted successfully and warehouse quantity updated.');
+    }    
 }

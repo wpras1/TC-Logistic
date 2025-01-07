@@ -50,10 +50,11 @@
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Edit Incoming Goods</h1>
+                        <h1 class="h3 mb-0 text-gray-800">Add Incoming Goods</h1>
                     </div>
 
                     <!-- Content Row -->
+
                     <div class="row">
                         <!-- Area Form -->
                         <div class="col-12">
@@ -64,49 +65,32 @@
                                 </div>
                                 <!-- Card Body -->
                                 <div class="card-body">
-                                    <form action="{{ route('incomingGoods.update', $incomingGoods->id) }}" method="POST">
+                                    <form action="{{ route('warehouse.store') }}" method="POST">
                                         @csrf
-                                        @method('PUT') <!-- Menggunakan method PUT untuk update -->
-                                    
                                         <div class="row">
                                             <div class="col-6">
                                                 <div class="form-group">
                                                     <label for="product_name">Product Name</label>
-                                                    <select class="form-control" id="product_name" name="product_name" required>
-                                                        <option value="">Select Product</option>
-                                                        @foreach ($products as $id => $productName)
-                                                            <option value="{{ $productName }}" {{ $incomingGoods->product_name == $productName ? 'selected' : '' }}>
-                                                                {{ $productName }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
+                                                    <input type="text" name="product_name" id="product_name" class="form-control" placeholder="Enter product name" required>
                                                 </div>
                                             </div>
-                                            <div class="col-6">
-                                                <div class="form-group">
-                                                    <label for="quantity">Quantity</label>
-                                                    <input type="number" class="form-control" id="quantity" name="quantity" value="{{ old('quantity', $incomingGoods->quantity) }}" required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    
-                                        <div class="row">
                                             <div class="col-6">
                                                 <div class="form-group">
                                                     <label for="date_in">Date In</label>
-                                                    <input type="date" class="form-control" id="date_in" name="date_in" value="{{ old('date_in', $incomingGoods->date_in) }}" required>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="form-group">
-                                                    <label for="origin">Origin</label>
-                                                    <input type="text" class="form-control" id="origin" name="origin" value="{{ old('origin', $incomingGoods->origin) }}" required>
+                                                    <input type="date" name="date_in" id="date_in" class="form-control" required>
                                                 </div>
                                             </div>
                                         </div>
-                                    
-                                        <button type="submit" class="btn btn-primary">Update</button>
-                                    </form>                                                                                                     
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label for="quantity">Quantity</label>
+                                                    <input type="number" name="quantity" id="quantity" class="form-control" placeholder="Enter quantity" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                    </form>                                                                  
                                 </div>
                             </div>
                         </div>
@@ -133,9 +117,4 @@
 
 {{-- </body> --}}
 
-
 @endsection
-
-
-
-

@@ -175,7 +175,7 @@
                                                     <tr>
                                                         <td>{{ $key + 1 }}</td>
                                                         <td>{{ $product['product_name'] }}</td>
-                                                        <td>{{ $product['incoming_from'] ?? '-' }}</td>
+                                                        <td>{{ $product['incoming_from'] ?? 'Warehouse' }}</td>
                                                         <td>{{ $product['outcoming_to'] ?? '-' }}</td>
                                                         <td>{{ $product['total_outcoming'] }}</td>
                                                         <td>{{ $product['stock_in_warehouse'] }}</td>

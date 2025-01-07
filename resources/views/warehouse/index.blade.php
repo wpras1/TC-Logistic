@@ -30,7 +30,7 @@
                     <form
                         class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                            <input type="text" id="searchInput" class="form-control bg-light border-0 small" placeholder="Search for..."
                                 aria-label="Search" aria-describedby="basic-addon2">
                             <div class="input-group-append">
                                 <button class="btn btn-primary" type="button">
@@ -64,6 +64,7 @@
                                 <!-- Card Header - Dropdown -->
                                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                     <h6 class="m-0 font-weight-bold text-primary">Warehouse Table</h6>
+                                    <a href="{{ route('warehouse.add') }}" class="btn btn-sm btn-success">Add Product</a>
                                 </div>
                                 <!-- Card Body -->
                                 <div class="card-body">
@@ -77,12 +78,12 @@
                                                             <i class="fas fa-sort"></i>
                                                         </button>
                                                     </th>
-                                                    <th>Incoming From</th>
                                                     <th>Stock Quantity
-                                                        <button id="sortQuantityBtn" class="btn btn-sm btn-link float-right">
+                                                        <button id="sortStockBtn" class="btn btn-sm btn-link float-right">
                                                             <i class="fas fa-sort"></i>
                                                         </button>
                                                     </th>
+                                                    {{-- <th>Date In</th> --}}
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -91,13 +92,14 @@
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td>{{ $warehouse->product_name }}</td>
-                                                        <td>{{ $warehouse->incomingGoods->origin ?? '-' }}</td>
                                                         <td>{{ $warehouse->quantity }}</td>
+                                                        {{-- <td>{{ $warehouse->date_in }}</td> --}}
                                                         <td class="text-center">
                                                             <a class="dropdown-toggle btn btn-sm btn-primary" href="#" role="button" id="dropdownMenuAction" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                                 <i class="fas fa-ellipsis-v"></i>
                                                             </a>
                                                             <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuAction">
+                                                                <a class="dropdown-item" href="{{ route('warehouse.edit', $warehouse->id) }}">Edit</a>
                                                                 <form action="{{ route('warehouse.destroy', $warehouse->id) }}" method="POST" class="d-inline">
                                                                     @csrf
                                                                     @method('DELETE')
@@ -147,76 +149,81 @@
 
     </div>
 
+    {{-- Script Search Bar --}}
+    <script>
+        document.getElementById('searchInput').addEventListener('keyup', function () {
+            const query = this.value.toLowerCase(); 
+            const rows = document.querySelectorAll('#reportTable tbody tr'); 
+
+            rows.forEach(row => {
+                const cells = Array.from(row.querySelectorAll('td')); 
+                const match = cells.some(cell => cell.textContent.toLowerCase().includes(query)); 
+                row.style.display = match ? '' : 'none'; 
+            });
+        });
+    </script>
+
     {{-- Script Sort Ascending dan Descending --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const tableBody = document.querySelector('#reportTable tbody'); 
             const originalData = Array.from(tableBody.children); 
             let nameOrder = 'none';
-            let quantityOrder = 'none';
+            let stockOrder = 'none';
             
             const resetTable = () => {
                 tableBody.innerHTML = '';
                 originalData.forEach(row => tableBody.appendChild(row));
             };
             
-            const sortColumn = (rows, columnIndex, order) => {
+            const sortColumn = (columnIndex, order, isNumeric = false) => {
+                const rows = Array.from(tableBody.children);
+
                 return rows.sort((a, b) => {
-                    let valA = a.children[columnIndex].textContent.trim();
-                    let valB = b.children[columnIndex].textContent.trim();
-                    
-                    if (columnIndex === 3) {
-                        valA = parseInt(valA, 10);
-                        valB = parseInt(valB, 10);
+                    const valA = isNumeric 
+                        ? parseInt(a.children[columnIndex].textContent.trim(), 10) 
+                        : a.children[columnIndex].textContent.trim().toLowerCase();
+                    const valB = isNumeric 
+                        ? parseInt(b.children[columnIndex].textContent.trim(), 10) 
+                        : b.children[columnIndex].textContent.trim().toLowerCase();
+
+                    if (isNumeric) {
+                        return order === 'asc' ? valA - valB : valB - valA;
                     } else {
-                        valA = valA.toLowerCase();
-                        valB = valB.toLowerCase();
-                    }
-    
-                    if (order === 'asc') {
-                        return valA > valB ? 1 : valA < valB ? -1 : 0;
-                    } else {
-                        return valA < valB ? 1 : valA > valB ? -1 : 0;
+                        return order === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
                     }
                 });
             };
             
-            const handleSort = (button, columnIndex, orderVariable) => {
-                let currentOrder = window[orderVariable];
-                let rows = Array.from(tableBody.children);
-    
-                if (currentOrder === 'none') {
-                    rows = sortColumn(rows, columnIndex, 'asc');
+            const handleSort = (button, columnIndex, orderVariable, isNumeric = false) => {
+                if (window[orderVariable] === 'none') {
+                    const sortedRows = sortColumn(columnIndex, 'asc', isNumeric);
+                    tableBody.innerHTML = '';
+                    sortedRows.forEach(row => tableBody.appendChild(row));
                     window[orderVariable] = 'asc';
-                    button.querySelector('i').className = 'fas fa-sort-up';
-                } else if (currentOrder === 'asc') {
-                    rows = sortColumn(rows, columnIndex, 'desc');
+                    button.querySelector('i').className = 'fas fa-sort-up'; 
+                } else if (window[orderVariable] === 'asc') {
+                    const sortedRows = sortColumn(columnIndex, 'desc', isNumeric);
+                    tableBody.innerHTML = '';
+                    sortedRows.forEach(row => tableBody.appendChild(row));
                     window[orderVariable] = 'desc';
-                    button.querySelector('i').className = 'fas fa-sort-down';
+                    button.querySelector('i').className = 'fas fa-sort-down'; 
                 } else {
                     resetTable();
                     window[orderVariable] = 'none';
-                    button.querySelector('i').className = 'fas fa-sort';
-                    return; 
+                    button.querySelector('i').className = 'fas fa-sort'; 
                 }
-                
-                tableBody.innerHTML = '';
-                rows.forEach(row => tableBody.appendChild(row));
             };
             
             document.getElementById('sortNameBtn').addEventListener('click', function () {
-                handleSort(this, 1, 'nameOrder');
-                quantityOrder = 'none'; 
-                document.getElementById('sortQuantityBtn').querySelector('i').className = 'fas fa-sort';
+                handleSort(this, 1, 'nameOrder', false); // Sort Product Name (String)
             });
             
-            document.getElementById('sortQuantityBtn').addEventListener('click', function () {
-                handleSort(this, 3, 'quantityOrder');
-                nameOrder = 'none'; 
-                document.getElementById('sortNameBtn').querySelector('i').className = 'fas fa-sort';
+            document.getElementById('sortStockBtn').addEventListener('click', function () {
+                handleSort(this, 2, 'stockOrder', true); // Sort Stock Quantity (Numeric)
             });
         });
-    </script>  
+    </script>
 
     {{-- Script Pagination --}}
     <script>
