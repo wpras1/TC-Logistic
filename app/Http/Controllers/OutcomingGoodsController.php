@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\OutcomingGoods;
 use App\Models\Warehouse;
+use Carbon\Carbon;
 
 class OutcomingGoodsController extends Controller
 {
@@ -23,31 +24,37 @@ class OutcomingGoodsController extends Controller
 
 
     public function store(Request $request)
-{
-    $validatedData = $request->validate([
-        'product_name' => 'required|string|max:255',
-        'quantity' => 'required|integer|min:1',
-        'destination' => 'required|string|max:255',
-        'date_out' => 'required|date',
-    ]);
+    {
+        $validatedData = $request->validate([
+            'product_name' => 'required|string|max:255',
+            'quantity' => 'required|integer|min:1',
+            'destination' => 'required|string|max:255',
+            'date_out' => 'required|date',
+        ]);
 
-    $warehouse = Warehouse::where('product_name', $validatedData['product_name'])->first();
+        $warehouse = Warehouse::where('product_name', $validatedData['product_name'])->first();
 
-    if ($warehouse && $warehouse->quantity < $validatedData['quantity']) {
-        return redirect()->back()->withErrors(['quantity' => 'Not enough stock in warehouse.'])->withInput();
-    }
+        if (!$warehouse) {
+            return redirect()->back()->withErrors(['product_name' => 'Product not found in warehouse.'])->withInput();
+        }
 
-    $outgoingGoods = OutcomingGoods::create($validatedData);
+        if (Carbon::parse($validatedData['date_out'])->lt(Carbon::parse($warehouse->date_in))) {
+            return redirect()->back()->withErrors([
+                'date_out' => 'Date Out cannot be earlier than Date In (' . $warehouse->date_in . ').',
+            ])->withInput();
+        }
 
-    if ($warehouse) {
+        if ($warehouse->quantity < $validatedData['quantity']) {
+            return redirect()->back()->withErrors(['quantity' => 'Not enough stock in warehouse.'])->withInput();
+        }
+
+        $outgoingGoods = OutcomingGoods::create($validatedData);
+
         $warehouse->quantity -= $validatedData['quantity'];
         $warehouse->save();
-    } else {
-        return redirect()->back()->with('error', 'Product not found in warehouse.');
-    }
 
-    return redirect()->route('outcomingGoods.index')->with('success', 'Goods removed and warehouse updated successfully.');
-}
+        return redirect()->route('outcomingGoods.index')->with('success', 'Goods Outgoing added successfully.');
+    }
 
 
     public function getProductStock(Request $request)
@@ -71,10 +78,13 @@ class OutcomingGoodsController extends Controller
     {
         $outcomingGoods = OutcomingGoods::find($id);
 
-        // Ambil data quantity sebelum diupdate (untuk menghitung selisih)
+        // Validasi jika date_out lebih kecil dari date_in
+        if (Carbon::parse($request->date_out)->lt(Carbon::parse($outcomingGoods->date_in))) {
+            return redirect()->back()->withErrors(['date_out' => 'Date Out cannot be earlier than Date In.'])->withInput();
+        }
+
         $oldQuantity = $outcomingGoods->quantity;
 
-        // Update data outcoming goods
         $outcomingGoods->update([
             'product_name' => $request->product_name,
             'date_out' => $request->date_out,
@@ -82,22 +92,16 @@ class OutcomingGoodsController extends Controller
             'destination' => $request->destination,
         ]);
 
-        // Ambil data warehouse untuk produk yang terpilih
         $warehouse = Warehouse::where('product_name', $outcomingGoods->product_name)->first();
 
         if ($warehouse) {
-            // Hitung selisih quantity, kemudian update quantity di warehouse
             $quantityDifference = $request->quantity - $oldQuantity;
-
-            // Tambahkan selisih quantity ke warehouse
             $warehouse->quantity -= $quantityDifference;
 
-            // Pastikan quantity tidak negatif
             if ($warehouse->quantity < 0) {
                 $warehouse->quantity = 0;
             }
 
-            // Simpan perubahan pada warehouse
             $warehouse->save();
         }
 

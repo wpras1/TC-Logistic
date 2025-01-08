@@ -84,6 +84,9 @@
                                                 <div class="form-group">
                                                     <label for="date_out">Date Out</label>
                                                     <input type="date" name="date_out" id="date_out" class="form-control" required>
+                                                    @error('date_out')
+                                                        <small class="text-danger">{{ $message }}</small>
+                                                    @enderror
                                                 </div>
                                             </div>
                                         </div>
@@ -189,6 +192,7 @@
     changePage(currentPage);
 </script>
 
+{{-- Script Warehouse Stock --}}
 <script>
     document.getElementById('product_name').addEventListener('change', function () {
         const productName = this.value;

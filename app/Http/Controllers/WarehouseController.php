@@ -62,8 +62,6 @@ class WarehouseController extends Controller
     return redirect()->route('warehouse.index')->with('success', 'Warehouse product updated successfully.');
 }
 
-
-
     public function destroy($id)
     {
         $warehouse = Warehouse::findOrFail($id);

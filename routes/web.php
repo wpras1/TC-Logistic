@@ -4,6 +4,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IncomingGoodsController;
 use App\Http\Controllers\OutcomingGoodsController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\DetailsController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,9 @@ use Illuminate\Support\Facades\Route;
 
 // Route for Home 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Route Detail of Goods
+Route::get('/details-goods/{productName}', [DetailsController::class, 'index'])->name('details.goods');
 
 
 // Route for Incoming Goods

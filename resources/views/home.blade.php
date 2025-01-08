@@ -160,8 +160,8 @@
                                                         </button>
                                                     </th>
                                                     <th style="width: 20%;">Incoming From</th>
-                                                    <th style="width: 20%;">Last Outcoming To</th>
-                                                    <th style="width: 16%;">Total Outcoming</th>
+                                                    <th style="width: 20%;">Last Outgoing To</th>
+                                                    <th style="width: 16%;">Total Outgoing</th>
                                                     <th style="width: 16%;">Warehouse Stock
                                                         <button class="btn btn-link p-0 float-right" id="sortWarehouseStockBtn" data-order="none">
                                                             <i class="fas fa-sort"></i>
@@ -184,7 +184,7 @@
                                                                 <i class="fas fa-ellipsis-v"></i>
                                                             </a>
                                                             <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuAction">
-                                                                <a class="dropdown-item" href="#">Details</a>
+                                                                <a class="dropdown-item" href="{{ route('details.goods', ['productName' => $product['product_name']]) }}">Details</a>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -231,6 +231,51 @@
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
+
+    {{-- css --}}
+    <style>
+        .hidden-for-report {
+            display: none !important;
+        }
+    </style>
+
+
+    {{-- Script Generate Report --}}
+    <script>
+        document.querySelector('#generateReportBtn').addEventListener('click', function () {
+            const { jsPDF } = window.jspdf;
+
+            // Sembunyikan kolom Action dan tombol sort
+            const actionCells = document.querySelectorAll('td:nth-child(7), th:nth-child(7)');
+            const sortButtons = document.querySelectorAll('#sortNameBtn, #sortWarehouseStockBtn');
+
+            actionCells.forEach(cell => cell.classList.add('hidden-for-report'));
+            sortButtons.forEach(button => button.classList.add('hidden-for-report'));
+
+            setTimeout(() => {
+                const reportTable = document.querySelector('#reportTable');
+
+                html2canvas(reportTable, { scale: 2 }).then((canvas) => {
+                    const imgData = canvas.toDataURL('image/png'); 
+                    const pdf = new jsPDF('p', 'mm', 'a4'); 
+                    
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const imgWidth = pageWidth - 20; 
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    const marginX = 10; 
+                    const marginY = 10; 
+                    
+                    pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
+                    
+                    pdf.save('Report.pdf');
+                }).finally(() => {
+                    actionCells.forEach(cell => cell.classList.remove('hidden-for-report'));
+                    sortButtons.forEach(button => button.classList.remove('hidden-for-report'));
+                });
+            }, 100); 
+        });
+    </script>
 
     {{-- Script Search Bar --}}
     <script>
@@ -374,31 +419,7 @@
         changePage(currentPage);
     </script>
 
-    {{-- Script Generate Report --}}
-    <script>
-        document.querySelector('#generateReportBtn').addEventListener('click', function () {
-            const { jsPDF } = window.jspdf;
-            
-            const reportTable = document.querySelector('#reportTable');
-            
-            html2canvas(reportTable, { scale: 2 }).then((canvas) => {
-                const imgData = canvas.toDataURL('image/png'); 
-                const pdf = new jsPDF('p', 'mm', 'a4'); 
-                
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                const imgWidth = pageWidth - 20; 
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                
-                const marginX = 10; 
-                const marginY = 10; 
-                
-                pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
-                
-                pdf.save('Report.pdf');
-            });
-        });
-    </script>
+    
 </body>
 
 @endsection

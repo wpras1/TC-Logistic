@@ -158,6 +158,24 @@
         <i class="fas fa-angle-up"></i>
     </a>
 
+    {{-- Script POP UP Alert --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: '{{ session('success') }}',
+                showConfirmButton: false,
+                timer: 2000, // Popup akan hilang otomatis setelah 2 detik
+                customClass: {
+                    popup: 'animated fadeInDown'
+                }
+            });
+            @endif
+        });
+    </script>
+
     {{-- Script Search Bar --}}
     <script>
         document.getElementById('searchInput').addEventListener('keyup', function () {
@@ -299,29 +317,47 @@
     </script>    
 
     {{-- Script Generate Report --}}
+    {{-- css --}}
+    <style>
+        .hidden-for-report {
+            display: none !important;
+        }
+    </style>
+
     <script>
         document.querySelector('#generateReportBtn').addEventListener('click', function () {
-        const { jsPDF } = window.jspdf;
+            const { jsPDF } = window.jspdf;
 
-        const reportTable = document.querySelector('#reportTable');
+            // Sembunyikan kolom Action dan tombol sort
+            const actionCells = document.querySelectorAll('td:nth-child(6), th:nth-child(6)');
+            const sortButtons = document.querySelectorAll('#sortNameIncomingBtn, #sortQuantityIncomingBtn');
 
-        html2canvas(reportTable, { scale: 2 }).then((canvas) => {
-            const imgData = canvas.toDataURL('image/png'); 
-            const pdf = new jsPDF('p', 'mm', 'a4'); 
+            actionCells.forEach(cell => cell.classList.add('hidden-for-report'));
+            sortButtons.forEach(button => button.classList.add('hidden-for-report'));
 
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-            const imgWidth = pageWidth - 20; 
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            setTimeout(() => {
+                const reportTable = document.querySelector('#reportTable');
 
-            const marginX = 10; 
-            const marginY = 10; 
-
-            pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
-
-            pdf.save('Report.pdf');
+                html2canvas(reportTable, { scale: 2 }).then((canvas) => {
+                    const imgData = canvas.toDataURL('image/png'); 
+                    const pdf = new jsPDF('p', 'mm', 'a4'); 
+                    
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const imgWidth = pageWidth - 20; 
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    const marginX = 10; 
+                    const marginY = 10; 
+                    
+                    pdf.addImage(imgData, 'PNG', marginX, marginY, imgWidth, imgHeight);
+                    
+                    pdf.save('Report.pdf');
+                }).finally(() => {
+                    actionCells.forEach(cell => cell.classList.remove('hidden-for-report'));
+                    sortButtons.forEach(button => button.classList.remove('hidden-for-report'));
+                });
+            }, 100); 
         });
-    });
     </script>
 </body>
 

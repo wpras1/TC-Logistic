@@ -26,6 +26,8 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
+    {{-- POP UP --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Add your custom styles for status in stock and out of stock -->
     <style>
@@ -49,6 +51,9 @@
         #reportTable th, #reportTable td {
             border: 1px solid black;
             padding: 8px;
+        }
+        .hidden-for-report {
+            display: none !important;
         }
     }
     </style>

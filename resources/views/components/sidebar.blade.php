@@ -9,7 +9,7 @@
             <div class="sidebar-brand-icon rotate-n-15">
                 <img class="img-profile rounded-circle" src="{{ asset('img/favicon-tripaconsult.jpeg') }}" width="40px">
             </div>
-            <div class="sidebar-brand-text mx-3">Tech-Logistich</div>
+            <div class="sidebar-brand-text mx-3">Tc-Logistic</div>
         </a>
 
         <!-- Divider -->
