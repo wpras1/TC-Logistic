@@ -119,7 +119,7 @@ Set up the database schema and populate initial data by running:
 
 ## Contribution
 
-Feel free to contribute to this project by submitting issues or pull requests on [GitHub](https://github.com/your-repo/logistics-system).
+Feel free to contribute to this project by submitting issues or pull requests on [GitHub](https://github.com/wpras1/TC-Logistic.git).
 
 ## License
 
