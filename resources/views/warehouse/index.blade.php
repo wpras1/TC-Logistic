@@ -72,19 +72,19 @@
                                         <table class="table table-bordered" id="reportTable">
                                             <thead>
                                                 <tr>
-                                                    <th>No</th>
-                                                    <th>Product Name
+                                                    <th style="width: 5%;">No</th>
+                                                    <th style="width: 55%;">Product Name
                                                         <button id="sortNameBtn" class="btn btn-sm btn-link float-right">
                                                             <i class="fas fa-sort"></i>
                                                         </button>
                                                     </th>
-                                                    <th>Stock Quantity
+                                                    <th style="width: 30%;">Stock Quantity
                                                         <button id="sortStockBtn" class="btn btn-sm btn-link float-right">
                                                             <i class="fas fa-sort"></i>
                                                         </button>
                                                     </th>
                                                     {{-- <th>Date In</th> --}}
-                                                    <th>Action</th>
+                                                    <th style="width: 10%;">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
