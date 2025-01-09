@@ -20,17 +20,20 @@ class WarehouseController extends Controller
         return view('warehouse.add');  
     }
 
-    // Menyimpan data barang yang ditambahkan
     public function store(Request $request)
     {
-        // Validasi input
         $request->validate([
             'product_name' => 'required',
             'quantity' => 'required|integer',
             'date_in' => 'required|date',
         ]);
 
-        // Menyimpan data barang ke database
+        // Cek apakah produk sudah ada
+        $existingProduct = Warehouse::where('product_name', $request->product_name)->first();
+        if ($existingProduct) {
+            return redirect()->back()->with('error', 'Product already exists in the warehouse.');
+        }
+
         Warehouse::create([
             'product_name' => $request->product_name,
             'quantity' => $request->quantity,
@@ -41,40 +44,64 @@ class WarehouseController extends Controller
     }
 
     public function update(Request $request, $id)
-{
-    $warehouse = Warehouse::findOrFail($id);
+    {
+        $warehouse = Warehouse::findOrFail($id);
 
-    // Simpan nama produk lama
-    $oldProductName = $warehouse->product_name;
+        // Cek apakah nama produk baru sudah ada di warehouse, kecuali produk saat ini
+            $existingProduct = Warehouse::where('product_name', $request->product_name)
+            ->where('id', '!=', $id)
+            ->first();
 
-    // Update data di warehouse
-    $warehouse->update([
-        'product_name' => $request->product_name,
-        'date_in' => $request->date_in,
-    ]);
+        if ($existingProduct) {
+        return redirect()->back()->with('error', 'Product with this name already exists in the warehouse.');
+        }
 
-    IncomingGoods::where('product_name', $oldProductName)
-        ->update(['product_name' => $request->product_name]);
+        // Simpan nama produk lama
+        $oldProductName = $warehouse->product_name;
 
-    OutcomingGoods::where('product_name', $oldProductName)
-        ->update(['product_name' => $request->product_name]);
+        // Cek apakah produk sudah digunakan di IncomingGoods atau OutcomingGoods
+        $isUsedInIncoming = IncomingGoods::where('product_name', $oldProductName)->exists();
+        $isUsedInOutgoing = OutcomingGoods::where('product_name', $oldProductName)->exists();
 
-    return redirect()->route('warehouse.index')->with('success', 'Warehouse product updated successfully.');
-}
+        if ($isUsedInIncoming || $isUsedInOutgoing) {
+            return redirect()->back()->with('error', 'Product is used in Incoming/Outgoing goods and cannot be updated.');
+        }
+
+        // Update data di warehouse
+        $warehouse->update([
+            'product_name' => $request->product_name,
+            'quantity' => $request->quantity,
+            'date_in' => $request->date_in,
+        ]);
+
+        return redirect()->route('warehouse.index')->with('success', 'Warehouse product updated successfully.');
+    }
 
     public function destroy($id)
     {
         $warehouse = Warehouse::findOrFail($id);
+        
+        IncomingGoods::where('product_name', $warehouse->product_name)->delete();
+        OutcomingGoods::where('product_name', $warehouse->product_name)->delete();
+
         $warehouse->delete();
-        return redirect()->route('warehouse.index')->with('success', 'Item deleted successfully');
+
+        return redirect()->route('warehouse.index')->with('success', 'Item deleted successfully, and related goods entries removed.');
     }
+
 
     public function edit($id)
     {
         $product = Warehouse::findOrFail($id);
-        $products = Warehouse::pluck('product_name', 'id');
+        
+        // Cek apakah produk sudah digunakan di IncomingGoods atau OutcomingGoods
+        $isUsedInIncoming = IncomingGoods::where('product_name', $product->product_name)->exists();
+        $isUsedInOutgoing = OutcomingGoods::where('product_name', $product->product_name)->exists();
 
-        return view('warehouse.edit', compact('product', 'products'));
+        // Jika produk sudah digunakan, flag untuk mencegah perubahan quantity
+        $isUsed = $isUsedInIncoming || $isUsedInOutgoing;
+
+        return view('warehouse.edit', compact('product', 'isUsed'));
     }
 
 

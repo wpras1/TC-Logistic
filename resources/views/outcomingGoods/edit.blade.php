@@ -66,13 +66,22 @@
                                 <div class="card-body">
                                     <form action="{{ route('outcomingGoods.update', $outcomingGoods->id) }}" method="POST">
                                         @csrf
-                                        @method('PUT') <!-- Menandakan bahwa ini adalah request PUT untuk update data -->
+                                        @method('PUT') 
+                                        <input type="hidden" name="product_name" value="{{ $outcomingGoods->product_name }}">
                                         <div class="row">
                                             <div class="col-6">
                                                 <div class="form-group">
                                                     <label for="product_name">Product Name</label>
-                                                    <input type="text" name="product_name" id="product_name" class="form-control" value="{{ $outcomingGoods->product_name }}" required>
-                                                    <small id="stock-info" class="form-text text-danger"></small> <!-- Teks stok -->
+                                                    <select name="product_name" id="product_name" class="form-control" disabled required>
+                                                        <option value="" disabled selected>-- Select Product --</option>
+                                                        @foreach ($products as $id => $product_name)
+                                                            <option value="{{ $product_name }}" 
+                                                                @if($outcomingGoods->product_name === $product_name) selected @endif>
+                                                                {{ $product_name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    <small id="stock-info" class="form-text text-danger"></small> 
                                                 </div>
                                             </div>
                                             <div class="col-6">

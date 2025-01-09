@@ -55,6 +55,22 @@
                                 <h6 class="m-0 font-weight-bold text-primary">Edit Product Details</h6>
                             </div>
                             <div class="card-body">
+                                {{-- Jika ada Erorr --}}
+                                @if (session('error'))
+                                    <div class="alert alert-danger">
+                                        {{ session('error') }}
+                                    </div>
+                                @endif
+                                @if ($errors->any())
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            @foreach ($errors->all() as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
+
                                 <form action="{{ route('warehouse.update', $product->id) }}" method="POST">
                                     @csrf
                                     @method('PUT')
@@ -83,7 +99,25 @@
                                                     required>
                                             </div>
                                         </div>
-                                    </div>                                    
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label for="quantity">Quantity</label>
+                                                <input 
+                                                    type="number" 
+                                                    class="form-control" 
+                                                    id="quantity" 
+                                                    name="quantity" 
+                                                    value="{{ old('quantity', $product->quantity) }}" 
+                                                    @if($isUsed) readonly @endif 
+                                                    required>
+                                                @if($isUsed)
+                                                    <small class="form-text text-danger">This product has been used in Incoming/Outgoing goods and cannot be edited.</small>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>                      
 
                                     <button type="submit" class="btn btn-primary">Update</button>
                                 </form>

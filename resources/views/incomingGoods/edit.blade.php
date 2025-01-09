@@ -72,7 +72,7 @@
                                             <div class="col-6">
                                                 <div class="form-group">
                                                     <label for="product_name">Product Name</label>
-                                                    <select class="form-control" id="product_name" name="product_name" required>
+                                                    <select class="form-control" id="product_name" name="product_name" disabled required>
                                                         <option value="">Select Product</option>
                                                         @foreach ($products as $id => $productName)
                                                             <option value="{{ $productName }}" {{ $incomingGoods->product_name == $productName ? 'selected' : '' }}>

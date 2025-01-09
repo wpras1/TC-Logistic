@@ -78,11 +78,6 @@ class OutcomingGoodsController extends Controller
     {
         $outcomingGoods = OutcomingGoods::find($id);
 
-        // Validasi jika date_out lebih kecil dari date_in
-        if (Carbon::parse($request->date_out)->lt(Carbon::parse($outcomingGoods->date_in))) {
-            return redirect()->back()->withErrors(['date_out' => 'Date Out cannot be earlier than Date In.'])->withInput();
-        }
-
         $oldQuantity = $outcomingGoods->quantity;
 
         $outcomingGoods->update([
@@ -105,22 +100,18 @@ class OutcomingGoodsController extends Controller
             $warehouse->save();
         }
 
-        return redirect()->route('outcomingGoods.index')->with('success', 'Goods Outgoing updated successfully.');
+    return redirect()->route('outcomingGoods.index')->with('success', 'Goods Outgoing updated successfully.');
     }
 
     public function destroy($id)
     {
-        // Ambil data outcoming goods yang akan dihapus
         $goods = OutcomingGoods::findOrFail($id);
 
-        // Ambil data warehouse untuk produk yang terpilih
         $warehouse = Warehouse::where('product_name', $goods->product_name)->first();
 
         if ($warehouse) {
-            // Tambahkan quantity yang dikeluarkan kembali ke warehouse
             $warehouse->quantity += $goods->quantity;
 
-            // Simpan perubahan pada warehouse
             $warehouse->save();
         }
 
