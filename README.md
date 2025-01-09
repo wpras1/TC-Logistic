@@ -1,63 +1,60 @@
-Logistics System - README
+# Tech Logistics System 
 
-Overview
+## Overview
 
-This system is designed to manage logistics operations, including warehouse inventory, incoming goods, and outgoing goods. It allows users to:
+Welcome to the **Logistics System**, designed to efficiently manage logistics operations such as warehouse inventory, incoming goods, and outgoing goods. With this system, users can:
 
-View the list of items in the warehouse.
+- View and manage the list of items in the warehouse.
+- Add new products to the warehouse.
+- Update existing products.
+- Delete products.
+- Track and update the usage of products in incoming and outgoing goods to ensure data consistency.
 
-Add new products to the warehouse.
+## Features
 
-Update existing products.
+### Warehouse Management
 
-Delete products.
+- Add, view, update, and delete warehouse items.
+- Prevent duplicate product names when adding or editing.
+- Restrict updates or deletions if products are linked to incoming or outgoing goods.
 
-Track the usage of products in incoming and outgoing goods to ensure data consistency.
+### Incoming and Outgoing Goods Management
 
-Features
+- Automatically update warehouse stock based on incoming and outgoing transactions.
+- Delete related incoming and outgoing records if a product is removed from the warehouse.
 
-Warehouse Management
+## Requirements
 
-Add, view, update, and delete warehouse items.
+- PHP 8.2 or higher.
+- Laravel 9.
+- MySQL (configured in `.env` file).
+- MongoDB (optional for advanced features).
 
-Prevent duplicate product names while adding or editing.
+## Installation
 
-Restrict updates or deletion if products are linked to incoming or outgoing goods.
+### Step 1: Clone the Repository
 
-Incoming and Outgoing Goods Management
+Clone the repository using the following command:
 
-Automatically update warehouse stock based on incoming and outgoing transactions.
+`git clone https://github.com/wpras1/TC-Logistic.git`
 
-Delete related incoming and outgoing records if a product is removed from the warehouse.
+### Step 2: Navigate to the Project Directory
 
-Requirements
+Move into the project directory:
 
-PHP 8.2 or higher.
+`cd TC-Logistic`
 
-Laravel 9.
+### Step 3: Install Dependencies
 
-MySQL (configured in .env file).
+Install PHP and JavaScript dependencies by running:
 
-MongoDB (optional for advanced features).
+`composer install`
 
-Installation
+`npm install && npm run dev`
 
-Clone the repository:
+### Step 4: Set Up the `.env` File
 
-git clone https://github.com/your-repo/logistics-system.git
-
-Navigate to the project directory:
-
-cd logistics-system
-
-Install dependencies:
-
-composer install
-npm install && npm run dev
-
-Set up the .env file:
-
-Configure database credentials (MySQL and optional MongoDB).
+Configure your database credentials for MySQL (and optional MongoDB).
 
 Example:
 
@@ -68,82 +65,62 @@ DB_DATABASE=logistics_db
 DB_USERNAME=root
 DB_PASSWORD=yourpassword
 
-Run migrations and seeders to set up the database:
 
-php artisan migrate --seed
+### Step 5: Run Migrations and Seeders
 
-Usage
+Set up the database schema and populate initial data by running:
 
-1. Warehouse Management
+`php artisan migrate --seed`
 
-Viewing Products
+## Usage
 
-Navigate to /warehouse to view all products in the warehouse.
+### 1. Warehouse Management
 
-Adding Products
+- **Viewing Products**: Navigate to `/warehouse` to see all products in the warehouse.
+- **Adding Products**:
+    1. Click on the **Add Product** button.
+    2. Fill in the product details:
+        - Product Name
+        - Quantity
+        - Date In
+    3. Submit the form.
+    4. If a product name already exists, an alert will notify you.
+- **Updating Products**:
+    1. Click **Edit** on a product.
+    2. Modify the details.
+    3. Submit the form.
+    4. If the new name matches an existing product, an alert will notify you.
+- **Deleting Products**:
+    1. Click **Delete** on a product.
+    2. Confirm the deletion.
+    3. If the product is linked to incoming or outgoing goods, related records will also be removed.
 
-Click on the Add Product button.
+### 2. Incoming and Outgoing Goods Management
 
-Fill in the form fields:
+- Use the dedicated views for managing incoming and outgoing goods transactions.
+- Ensure that warehouse stock is updated automatically for each transaction.
 
-Product Name
+## Notes
 
-Quantity
+- **Backup**: Always back up your database before making major changes.
+- **Server Requirements**: Ensure that your server environment meets all Laravel prerequisites.
 
-Date In
+## Troubleshooting
 
-Submit the form.
+### Issue: Duplicate Product Name Error
 
-If the product name already exists, an alert will notify you.
+- **Cause**: Trying to add or edit a product with a name that already exists.
+- **Solution**: Use a unique product name.
 
-Updating Products
+### Issue: Cannot Delete Product
 
-Click the Edit button on a product.
+- **Cause**: The product is linked to incoming or outgoing goods.
+- **Solution**: Delete related incoming or outgoing records first.
 
-Modify the fields as needed.
+## Contribution
 
-Submit the form.
+Feel free to contribute to this project by submitting issues or pull requests on [GitHub](https://github.com/your-repo/logistics-system).
 
-If the new product name matches an existing product, an alert will notify you.
+## License
 
-Deleting Products
-
-Click the Delete button on a product.
-
-Confirm the deletion.
-
-If the product is linked to incoming or outgoing goods, related records will also be removed.
-
-2. Incoming and Outgoing Goods Management
-
-Use dedicated views for incoming and outgoing goods to add or manage transactions.
-
-Ensure consistency with warehouse stock automatically.
-
-Notes
-
-Always back up your database before making major changes.
-
-Ensure the server environment meets all Laravel requirements.
-
-Troubleshooting
-
-Issue: Duplicate Product Name Error
-
-Cause: Trying to add or edit a product with a name that already exists in the warehouse.
-
-Solution: Use a unique product name.
-
-Issue: Cannot Delete Product
-
-Cause: Product is linked to incoming or outgoing goods.
-
-Solution: Delete related incoming or outgoing records first.
-
-Contribution
-
-Feel free to contribute to this project by submitting issues or pull requests on GitHub.
-
-License
-
-This project is licensed under the MIT License.
+This project is licensed under the **MIT License**.
